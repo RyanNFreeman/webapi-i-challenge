@@ -1,8 +1,6 @@
 // implement your API here
 const express = require('express')
-
 const db = require('./data/db.js')
-
 const server = express();
 
 server.use(express.json())
@@ -13,7 +11,7 @@ server.post('/api/users', (req, res) => {
     const newUser = req.body;
     !newUser.name || !newUser.bio ?
     res.status(400).json({ errorMessage: "Please provide name and bio for the user."})
-    : db
+    : db // do not need db.users. This alreadys has all users
         .insert(newUser)
         .then(user => {
             res.status(201).json(user);
@@ -23,7 +21,7 @@ server.post('/api/users', (req, res) => {
                 error: "There was an error while saving the user to the database"
             })
         })
-}) //NOT WORKING YET
+}) //WORKING
 
 ///READ operations
 server.get('/api/users', (req, res) => {
@@ -38,17 +36,18 @@ server.get('/api/users', (req, res) => {
     })
 }) //WORKING
 
-server.get('/api/users:id', (req, res) => {
-    const { id } = req.params;
-    db.findById(id)
+server.get('/api/users/:id', (req, res) => {
+    const id = req.params.id;
+    db
+    .findById(id)
     .then(users => {
         res.status(200).json(users)
     })
-    .catch(error => {
-        res.status(404).json({ })
+    .catch(err => {
+        res.status(404).json({ message: "The user with the specified ID does not exist." })
     })
     
-}) // NOT WORKING YET
+}) // NOT WORKING YET. Coming back to this
 
 //UPDATE operations
 server.put('/api/users/:id', (req, res) => {
