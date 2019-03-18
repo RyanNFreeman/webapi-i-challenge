@@ -47,19 +47,43 @@ server.get('/api/users/:id', (req, res) => {
         res.status(404).json({ message: "The user with the specified ID does not exist." })
     })
     
-}) // NOT WORKING YET. Coming back to this
+}) //WORKING
 
 //UPDATE operations
 server.put('/api/users/:id', (req, res) => {
     //Updates the user with the specified id using data from the request body. Returns the modified document, NOT the original.
-})
+    const id = req.params.id;
+    const changes = req.body;
+    db.users
+        .update(id, changes)
+        .then(updated => {
+            if(updated) {
+            res.status(200).json(updated)
+        } else {
+            res.status(404).json({ message: "The user with the specified ID does not exist." })
+        };
+    })
+    .catch(err => {
+        res.status(500).json({ message: 'error updating user'})
+    })
+}) //not working come back to this
 
 //DELETE operations
 server.delete('/api/users/:id', (req, res) => {
     //Removes the user with the specified id and returns the deleted user
+    const id = req.params.id
+    db
+    .remove(id)
+    .then(deleted => {
+        res.status(204).end()
+    })
+    .catch(err => {
+        res.status(500).json({ message: 'error deleting user' })
+    })
+
 })
 
 server.listen(5000, () => {
-    console.log('\n** API up and running on port 5k ***')
+    console.log('\n** API up and running on port 5000 ***')
 })
 
