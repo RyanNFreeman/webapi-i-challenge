@@ -10,9 +10,20 @@ server.use(express.json())
 ///CREATE operations
 server.post('/api/users', (req, res) => {
     //Creates a user using the information sent inside the request body
-    const userInfo = req.body;
-    console.log('user information', userInfo);
-})
+    const newUser = req.body;
+    !newUser.name || !newUser.bio ?
+    res.status(400).json({ errorMessage: "Please provide name and bio for the user."})
+    : db
+        .insert(newUser)
+        .then(user => {
+            res.status(201).json(user);
+        })
+        .catch(error => {
+            res.status(500).json({
+                error: "There was an error while saving the user to the database"
+            })
+        })
+}) //NOT WORKING YET
 
 ///READ operations
 server.get('/api/users', (req, res) => {
@@ -25,11 +36,19 @@ server.get('/api/users', (req, res) => {
     .catch(error => {
         res.status(500).json({ error: "The users information could not be retrieved." })
     })
-}) //not working yet
+}) //WORKING
 
 server.get('/api/users:id', (req, res) => {
-    res.send('Sanity Check')
-})
+    const { id } = req.params;
+    db.findById(id)
+    .then(users => {
+        res.status(200).json(users)
+    })
+    .catch(error => {
+        res.status(404).json({ })
+    })
+    
+}) // NOT WORKING YET
 
 //UPDATE operations
 server.put('/api/users/:id', (req, res) => {
